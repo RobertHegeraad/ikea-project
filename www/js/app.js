@@ -3,7 +3,7 @@
 // angular.module is a global place for creating, registering and retrieving Angular modules
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
-angular.module('starter', ['ionic'])
+angular.module('starter', ['ionic', 'controllers'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -22,4 +22,49 @@ angular.module('starter', ['ionic'])
       StatusBar.styleDefault();
     }
   });
+
+  console.log('sdaadsad');
+})
+
+.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+
+  // $ionicConfigProvider.views.transition('ios');
+
+  $stateProvider
+
+  // .state('app', {
+  //   url: "/app",
+  //   abstract: true,
+  //   templateUrl: "menu.html"
+  // })
+
+  .state('login', {
+    url: '/login',
+    views: {
+      'MainContent': {
+        templateUrl: 'login.html'
+      }
+    }
+  })
+
+  .state('start', {
+    url: '/start',
+    views: {
+      'MainContent': {
+        templateUrl: 'start.html'
+      }
+    }
+  })
+  
+  $urlRouterProvider.otherwise("/start");
+})
+
+.factory('BLE', function($rootScope) {
+    return {
+      init: function() {
+          var paramsObj = {request:true};
+          console.log("Initialize : " + JSON.stringify(paramsObj));
+          bluetoothle.initialize(initializeSuccess, initializeError, paramsObj);
+      }
+    };
 });

@@ -6,7 +6,7 @@
     <title></title>
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
+    <link href="css/index.css" rel="stylesheet">
 
     <!-- IF using Sass (run gulp sass first), then remove the CSS include above
     <link href="css/ionic.app.css" rel="stylesheet">
@@ -23,12 +23,72 @@
   </head>
 
   <body ng-app="starter">
-    <ion-pane>
-      <ion-header-bar class="bar-stable">
-        <h1 class="title">Ionic Blank Starter</h1>
-      </ion-header-bar>
-      <ion-content class="has-header">
-      </ion-content>
-    </ion-pane>
+
+    <!-- Main template, other templates will be loaded into the MainContent view -->
+    <ion-side-menus>
+      <ion-pane ion-side-menu-content>
+        <ion-nav-bar class="bar-stable"></ion-nav-bar>
+        <ion-nav-view name="MainContent"></ion-nav-view>
+      </ion-pane>
+
+      <ion-side-menu side="left">
+        <ion-content>
+          <ul id="menu-list">
+            <li>
+                <div id="card">
+                    <img id="card-profile-image" class="round user" data-info="profile-image" src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xfa1/v/t1.0-1/c13.0.50.50/p50x50/10390333_779505348747582_7041021029615437478_n.jpg?oh=4ba308795e8669e60cfdc707b98c5289&oe=558EEDD4&__gda__=1435459323_6f83ce7c4344e738c7887e34e787f539">
+                    <h1 id="card-name" class="user" data-info="full-name"></h1>
+                    <hr>
+                </div>
+            </li>
+            <li><a class="btn locale" ui-sref="settings" menu-close>Settings</a></li>
+            <li><a class="btn locale" ui-sref="products" menu-close>Products</a></li>
+            <li ng-controller="authCtrl">
+              <button id="logout-btn" class="btn locale" on-touch="Logout()">Logout</button>
+            </li>
+        </ul>
+        </ion-content>
+      </ion-side-menu>
+    </ion-side-menus>
+
+    <!-- LOGIN -->
+    <script id="login.html" type="text/ng-template">
+      <ion-view title="Ikea" hide-back-button="true" hide-nav-bar="true">
+        <ion-nav-buttons side="left">
+          <button class="button">
+            Ikea
+          </button>
+        </ion-nav-buttons>
+        <ion-nav-buttons side="right">
+          <button class="button" menu-toggle="left">User</button>
+        </ion-nav-buttons>
+
+        <ion-content class="padding" ng-controller="authCtrl">
+          <button class="button" on-touch="Login()">Login with Facebook</button>
+        </ion-content>
+      </ion-view>
+    </script>
+
+
+
+    <!-- START -->
+    <script id="start.html" type="text/ng-template">
+      <ion-view title="Ikea" hide-back-button="true">
+        <ion-nav-buttons side="left">
+          <button class="button">
+            Ikea
+          </button>
+        </ion-nav-buttons>        
+        <ion-nav-buttons side="right">
+          <button class="button" menu-toggle="left">User</button>
+        </ion-nav-buttons>
+
+        <ion-content class="padding">
+          <a class="button" ui-sref="settings">Go To Settings</a>
+        </ion-content>
+      </ion-view>
+    </script>
+  
+  <script src="js/controllers.js"></script>
   </body>
 </html>
