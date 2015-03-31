@@ -1,0 +1,18 @@
+#genres{
+    margin-top: 3em;
+    margin-left: 2em;
+    font-size: 20px;
+}
+li{
+    margin-top: 1em;
+    color: #1A24CC;
+}
+.title{
+    font-family: "arial black";
+}
+.logo{
+    margin-top: -0.5em;
+    margin-left: -0.4em;
+    height: 3.3em;
+    width: 5em;
+}
