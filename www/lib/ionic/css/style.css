@@ -1,11 +1,14 @@
 #genres{
-    margin-top: 3em;
-    margin-left: 2em;
+    margin-top: 2em;
     font-size: 20px;
 }
 li{
     margin-top: 1em;
     color: #1A24CC;
+    border-bottom: 0.05em solid;
+    text-align: center;
+    border-color: #CCA646;
+
 }
 .title{
     font-family: "arial black";
@@ -24,4 +27,11 @@ li{
 }
 #back{
 
+}
+a{
+    text-decoration: none;
+
+}
+a:hover{
+    color:#606499;
 }
