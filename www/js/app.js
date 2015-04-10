@@ -36,11 +36,11 @@ angular.module('starter', ['ionic', 'controllers'])
   //   templateUrl: "menu.html"
   // })
 
-  .state('login', {
-    url: '/login',
+  .state('debug', {
+    url: '/debug',
     views: {
       'MainContent': {
-        templateUrl: 'login.html'
+        templateUrl: 'debug.html'
       }
     }
   })
@@ -54,7 +54,35 @@ angular.module('starter', ['ionic', 'controllers'])
     }
   })
   
+  .state('products', {
+    url: '/products',
+    views: {
+      'MainContent': {
+        templateUrl: 'products.html'
+      }
+    }
+  })
+
+  .state('badkamer', {
+    url: '/badkamer',
+    views: {
+      'MainContent': {
+        templateUrl: 'badkamer.html'
+      }
+    }
+  })
+
+  .state('badkameracc', {
+    url: '/badkameracc',
+    views: {
+      'MainContent': {
+        templateUrl: 'badkameracc.html'
+      }
+    }
+  })
+
   $urlRouterProvider.otherwise("/start");
+  // $urlRouterProvider.otherwise("/debug");
 })
 
 /*
@@ -84,11 +112,23 @@ angular.module('starter', ['ionic', 'controllers'])
         bluetoothle.retrieveConnected(s, f, {});
       },
 
+      /*
+       * Discover all the devices services, characteristics and descriptors.
+       * Doesn't need to be called again after disconnecting and then reconnecting.
+       * Android support only.
+       */
       Discover: function(s, f, addressObj) {
         console.log('BLE discover');
 
         bluetoothle.discover(s, f, {
-          "address": "00:22:D0:3B:32:10"
+          "address": "6C:71:D9:9D:64:EE"
+        });
+      },
+
+      Connect: function(s, f, addressObj) {
+        // 6C:71:D9:9D:64:EE -> Robert PC
+        bluetoothle.connect(s, f, {
+          "address": "6C:71:D9:9D:64:EE"
         });
       },
 
@@ -96,8 +136,19 @@ angular.module('starter', ['ionic', 'controllers'])
         console.log('BLE disconnect');
 
         bluetoothle.disconnect(s, f, {
-          "address": "ECC037FD-72AE-AFC5-9213-CA785B3B5C63"
+          "address": "6C:71:D9:9D:64:EE"
         })
+      },
+
+      /*
+       * Check if a device is connected
+       */
+      IsConnected: function() {
+        var connected;
+        bluetoothle.isConnected(connected, {
+          "address": "6C:71:D9:9D:64:EE"
+        });
+        return connected;
       }
     };
 });
