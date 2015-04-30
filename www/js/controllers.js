@@ -1,6 +1,6 @@
 angular.module('controllers', [])
 
-.controller('debugCtrl', function($scope, $BLE) {
+.controller('debugCtrl', function($scope, $BLE, $compile) {
 
   // LIFECYCLE
   // ---------
@@ -11,6 +11,8 @@ angular.module('controllers', [])
   // read/subscribe/write characteristics/descriptors
   // disconnect
   // close
+
+  $scope.address = '6C:71:D9:9D:64:EE';
 
   $scope.status = function(message) {
       document.getElementById('status').innerHTML = message;
@@ -55,15 +57,21 @@ angular.module('controllers', [])
       }
     */
     $BLE.StartScan(function(o) {
+
+      document.getElementById('list').innerHTML = '';
+
       console.log('Scan started successful');
       $scope.status(o.message);
 
       console.log(JSON.stringify(o));
 
       var html = '';
-      for(item in o) {
-        html += '<li>Name: ' + item + '</li>';
-      }
+        html += '<li>';
+        html += '<b>Status</b> ' + o[i].status;
+        html += ' <b>Address</b> ' + o[i].address;
+        html += ' <b>RSSI</b> ' + o[i].rssi;
+        html += ' <button class="connect-btn" ng-touch="AddressClick(' + o[i].address + ')" data-address="' + o[i].address + '">Connect</button>';
+        html += '</li>';
       
       document.getElementById('list').innerHTML = html;
 
@@ -72,6 +80,21 @@ angular.module('controllers', [])
       $scope.status(o.message);
 
       console.log(JSON.stringify(o));
+    });
+
+    var timer = setTimeout(function() {
+        $scope.StopScan();
+    }, 2000);
+  },
+
+  /*
+   * Stop scanning
+   */
+  $scope.StopScan = function() {
+    $BLE.StopScan(function(o) {
+      console.log('Scan stopped');
+    }, function(o) {
+      console.log('Scan failed to stop');
     });
   },
 
@@ -130,12 +153,12 @@ angular.module('controllers', [])
       console.log('Retrieve connected successful');
       $scope.status(o.message);
 
-      var html = '';
-      for(item in o) {
-        html += '<li>Name: ' + item + '</li>';
+      $('#connected-list').html('');
+
+      for(var i=0; i<o.length; i++) {
+        $el = $('<li>' + o[i].name + ' ' + o[i].address + ' <button class="btn connect-btn" data-ng-click="AddressClick($event)" data-address="' + o[i].address + '">Select</button></li>').appendTo('#connected-list');
+        $compile($el)($scope);
       }
-      
-      document.getElementById('list').innerHTML = html;
 
       console.log(JSON.stringify(o));
     }, function(o) {
@@ -153,19 +176,31 @@ angular.module('controllers', [])
       "status": "connecting" / "connected" / "diconnected"
     }
    */
-  $scope.Connect = function(addressObj) {
+
+   // timeout toevoegen
+  $scope.Connect = function() {
+    var timeout = 5000;
+
     $BLE.Connect(function(o) {
       console.log('Connect successful');
       
       console.log(JSON.stringify(o));
+
+      return o;
     }, function(o) {
       console.log('Connect failed');
       
       console.log(JSON.stringify(o));
-    }, addressObj);
+
+      return o;
+    }, $scope.address);
+
+    var timer = setTimeout(function() {
+      return false;
+    }, timeout);
   },
 
-  $scope.Disconnect = function(addressObj) {
+  $scope.Disconnect = function() {
     $BLE.Disconnect(function(o) {
       console.log('Disconnect successful');
       
@@ -174,15 +209,49 @@ angular.module('controllers', [])
       console.log('Disconnect failed');
       
       console.log(JSON.stringify(o));
-    }, addressObj);
+    }, $scope.address);
+  },
+
+  $scope.Reconnect = function() {
+    $BLE.Reconnect(function(o) {
+      console.log('Reconnect successful');
+      console.log(JSON.stringify(o));
+    }, function(o) {
+      console.log('Reconnect failed');
+
+      console.log(JSON.stringify(o));
+    }, $scope.address);
   },
 
   $scope.IsConnected = function(addressObj) {
     console.log(JSON.stringify($BLE.IsConnected(addressObj)));
+  },
+
+  $scope.Close = function() {
+    $BLE.Close(function(o) {
+      console.log('Close successful');
+      
+      console.log(JSON.stringify(o));
+    }, function(o) {
+      console.log('Close failed');
+      
+      console.log(JSON.stringify(o));
+    }, $scope.address);
+  },
+
+
+
+  /*
+   * When the connect button is pressed for an address
+   */
+  $scope.AddressClick = function($event) {
+    var address = $($event.target).data('address');
+
+    $scope.address = address;
   }
 })
 
-.controller('startCtrl', function($scope) {
+.controller('startCtrl', function($scope, $compile) {
 
   $scope.ToggleStatus = function() {
     var $statusBtn = $('#status-btn');
@@ -190,12 +259,21 @@ angular.module('controllers', [])
     if($statusBtn.hasClass('status-ready')) {
       $statusBtn.removeClass('status-ready');
       $statusBtn.addClass('status-busy');
-      $statusBtn.html('Je bent bezig')
+      $statusBtn.html('Je bent bezig');
+
+      // var $el = $('<li><button class="btn connect-btn" data-ng-click="AddressClick($event)" data-address="test">Connect</button></li>').appendTo('#testc');
+      // $compile($el)($scope);
     } else {
       $statusBtn.removeClass('status-busy');
       $statusBtn.addClass('status-ready');
-      $statusBtn.html('Je bent beschikbaar')
+      $statusBtn.html('Je bent beschikbaar');
     }
+  },
+
+  $scope.AddressClick = function($event) {
+    var $target = $event.target;
+    console.log($($target).data('address'));
+    // var address = $target.data('address');
   }
 })
 

@@ -117,54 +117,57 @@ angular.module('starter', ['ionic', 'controllers'])
        * Doesn't need to be called again after disconnecting and then reconnecting.
        * Android support only.
        */
-      Discover: function(s, f, address) {
+      Discover: function(s, f, addressObj) {
         console.log('BLE discover');
 
         bluetoothle.discover(s, f, {
-          "address": address
+          "address": "9C:3D:5B:1D:11:14"
         });
       },
 
-      Connect: function(s, f, address) {
+      Connect: function(s, f, addressObj) {
         // 6C:71:D9:9D:64:EE -> Robert PC
-        bluetoothle.connect(s, f, {
-          'address': address
+        // 9C:3D:5B:1D:11:14
+        var connection = bluetoothle.connect(s, f, {
+          "address": "9C:3D:5B:1D:11:14"
         });
+
+        console.log('Connection: ' + connection);
       },
 
-      Disconnect: function(s, f, address) {
+      Disconnect: function(s, f, addressObj) {
         console.log('BLE disconnect');
 
         bluetoothle.disconnect(s, f, {
-          "address": address
-        })
+          "address": "9C:3D:5B:1D:11:14"
+        });
       },
 
-      Reconnect: function(s, f, address) {
+      Reconnect: function(s, f, addressObj) {
         console.log('BLE reconnect');
 
         bluetoothle.reconnect(s, f, {
-          "address": address
-        })
-      },
-
-      Close: function(s, f, address) {
-        console.log('BLE close ' + address);
-
-        bluetoothle.close(s, f, {
-          "address": address
-        })
+          "address": "9C:3D:5B:1D:11:14"
+        });
       },
 
       /*
        * Check if a device is connected
        */
-      IsConnected: function() {
+      IsConnected: function(addressObj) {
         var connected;
-        return bluetoothle.isConnected(connected, {
-          "address": "6C:71:D9:9D:64:EE"
+        bluetoothle.isConnected(connected, {
+          "address": "9C:3D:5B:1D:11:14"
         });
         return connected;
+      },
+
+      Close: function(s, f, addressObj) {
+        console.log('BLE close');
+
+        bluetoothle.close(s, f, {
+          "address": "9C:3D:5B:1D:11:14"
+        });
       }
     };
 });

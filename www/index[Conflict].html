@@ -33,6 +33,22 @@
         <ion-nav-view name="MainContent"></ion-nav-view>
       </ion-pane>
 
+<!--       <ion-side-menu side="left">
+        <ion-content>
+          <ul id="menu-list">
+            <li>
+                <div id="card">
+                    <img id="card-profile-image" class="round user" data-info="profile-image" src="https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xfa1/v/t1.0-1/c13.0.50.50/p50x50/10390333_779505348747582_7041021029615437478_n.jpg?oh=4ba308795e8669e60cfdc707b98c5289&oe=558EEDD4&__gda__=1435459323_6f83ce7c4344e738c7887e34e787f539">
+                    <h1 id="card-name" class="user" data-info="full-name"></h1>
+                    <hr>
+                </div>
+            </li>
+            <li><a class="btn locale" ui-sref="settings" menu-close>Settings</a></li>
+            <li><a class="btn locale" ui-sref="products" menu-close>Products</a></li>
+        </ul>
+        </ion-content>
+      </ion-side-menu>
+    </ion-side-menus> -->
 
     <!-- DEBUG -->
     <script id="debug.html" type="text/ng-template">
@@ -51,22 +67,16 @@
 
           <a class="button" on-touch="Init()">Init Bluetooth</a>
           <a class="button" on-touch="Scan()">Scan for devices</a>
-          <a class="button" on-touch="StopScan()">Stop Scanning</a>
-          
+          <a class="button" on-touch="Discover()">Discover</a>
           <a class="button" on-touch="RetrieveConnected()">Retrieve connected</a>
-          
-          <a class="button option-btn" on-touch="Discover()">Discover</a>
-          <a class="button option-btn" on-touch="Connect()">Connect</a>
-          <a class="button option-btn" on-touch="Reconnect()">Reconnect</a>
-          <a class="button option-btn" on-touch="Disconnect()">Disconnect</a>
-          <a class="button option-btn" on-touch="Close()">Close</a>
+          <a class="button" on-touch="Connect()">Connect</a>
+          <a class="button" on-touch="Disconnect()">Disconnect</a>
+          <a class="button" on-touch="Reconnect()">Reconnect</a>
+          <a class="button" on-touch="Close()">Close</a>
 
           <a class="button" on-touch="IsConnected()">Check if a device is connected</a>
 
           <ul id="list">
-          </ul>
-
-          <ul id="connected-list">
           </ul>
         </ion-content>
       </ion-view>
@@ -80,8 +90,6 @@
         </ion-nav-buttons>
 
         <ion-content class="schematic-bg" ng-controller="startCtrl">
-
-          <div id="testc"></div>
 
           <button id="status-btn" class="status-ready" on-touch="ToggleStatus()">Je bent beschikbaar</button>
 
