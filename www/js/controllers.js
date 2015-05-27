@@ -1,6 +1,6 @@
 angular.module('controllers', [])
 
-.controller('debugCtrl', function($scope, $BLE, $compile) {
+.controller('debugCtrl', function($scope, $BLE, $compile, $BL) {
 
   // LIFECYCLE
   // ---------
@@ -248,6 +248,68 @@ angular.module('controllers', [])
     var address = $($event.target).data('address');
 
     $scope.address = address;
+  },
+
+
+
+  $scope.InitBL = function() {
+    $BL.Init(function(data) {
+
+    }, function(data) {
+
+    });
+  },
+
+  /*
+   * Connect, voor button pair medewerker
+   */
+  $scope.ConnectBL = function() {
+    $BL.Connect('', function(data) {
+
+    }, function(data) {
+
+    });
+  },
+
+  $scope.WriteBL = function() {
+    $BL.Write('', function(data) {
+
+    }, function(data) {
+
+    });
+  },
+
+  $scope.ReadBL = function() {
+    $BL.Read(function(data) {
+      // update status van medewerker
+    }, function(data) {
+      // set status op beschikbaar
+    });
+  },
+
+  $scope.ListBL = function() {
+    $BL.List(function(data) {
+
+    }, function(data) {
+
+    });
+  },
+
+  $scope.SubscribeBL = function() {
+    console.log('Subscribing...')
+    $BL.Subscribe(function(data) {
+
+    }, function(data) {
+
+    });
+  },
+
+  $scope.DiscoverUnpairedBL = function() {
+    $BL.DiscoverUnpaired(function(data) {
+
+    }, function(data) {
+
+    });
   }
 })
 
@@ -279,8 +341,20 @@ angular.module('controllers', [])
 
 .controller('productCtrl', function($scope) {
 
+  $scope.color = function() {
+
+    $('#color-picker').fadeToggle(200);
+  },
+
+  $scope.setColor = function(color, $event) {
+    $('.color-picker-toggle').css('backgroundColor', color);
+    $('#color-picker').fadeOut(200);
+  },
+
   $scope.onToggle = function(value) {
 
+    console.log('lamp toggle');
+    
     if(value === true) {
       $('#toggle div span').html('Lamp staat aan');
     } else {

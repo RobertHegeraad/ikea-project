@@ -49,7 +49,7 @@
         <ion-content class="padding" ng-controller="debugCtrl">
           <h2 id="status"></h2>
 
-          <a class="button" on-touch="Init()">Init Bluetooth</a>
+          <a class="button" on-touch="Init()">Init BLE</a>
           <a class="button" on-touch="Scan()">Scan for devices</a>
           <a class="button" on-touch="StopScan()">Stop Scanning</a>
           
@@ -63,8 +63,23 @@
 
           <a class="button" on-touch="IsConnected()">Check if a device is connected</a>
 
-          <ul id="list">
-          </ul>
+
+
+          <ul id="list"></ul>
+
+
+
+          <hr/>
+
+
+          <a class="button" on-touch="InitBL()">Init BL</a>
+          <a class="button" on-touch="ConnectBL()">Connect BL</a>
+          <a class="button" on-touch="WriteBL()">Write BL</a>
+          <a class="button" on-touch="ReadBL()">Read BL</a>
+          <a class="button" on-touch="SubscribeBL()">Subscribe BL</a>
+          <a class="button" on-touch="ListBL()">List paired BL</a>
+          <a class="button" on-touch="DiscoverUnpairedBL()">Discover unpaired BL</a>
+
 
           <ul id="connected-list">
           </ul>
@@ -164,7 +179,23 @@
           <img class="product" src="lib/ionic/img/ikea-wastafel.jpg"/>
 
           <div class="product-switch">
-            <ion-toggle id="toggle" ng-model="toggle" id="toggle" toggle-class="toggle-calm" ng-change="onToggle(toggle)">Lamp staat uit</ion-toggle>
+            <h3>Lamp</h3>
+            <select>
+              <option>30 seconden</option>
+              <option selected>1 minuut</option>
+              <option>5 minuut</option>
+            </select>
+
+            <div class="color-picker-toggle" ng-model="colorpicker" ng-click="color()"></div>
+
+            <div id="color-picker" class="color-picker">
+              <div class="color color-blue" data-color="blue" ng-click="setColor('blue', $event)"></div>
+              <div class="color color-yellow" data-color="yellow" ng-click="setColor('yellow', $event)"></div>
+              <div class="color color-red" data-color="red" ng-click="setColor('red', $event)"></div>
+              <div class="color color-green" data-color="green" ng-click="setColor('green', $event)"></div>
+            </div>
+
+            <ion-toggle id="toggle" ng-model="toggle" id="toggle" toggle-class="toggle-calm" ng-change="onToggle(toggle)"></ion-toggle>
           </div>
 
           <div class="product-info">

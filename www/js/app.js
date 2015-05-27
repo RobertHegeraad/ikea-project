@@ -167,4 +167,104 @@ angular.module('starter', ['ionic', 'controllers'])
         return connected;
       }
     };
+})
+
+
+/*
+ * ID: 00:6A:8E:16:C8:EB
+ * Class: 7936
+ * Address: 6C:71:D9:9D:64:EE
+ * Name: Naambordje
+ */
+.factory('$BL', function($rootScope) {
+    return {
+      Init: function(s, f) {
+          console.log('BL init');
+          bluetoothSerial.enable(function(data) {
+            console.log('BL init success');
+            console.log(JSON.stringify(data));
+          }, function(data) {
+            console.log('BL init failed');
+            console.log(JSON.stringify(data));
+          });
+      },
+
+      /*
+       * connects to a Bluetooth device. The callback is long running.
+       */
+      Connect: function(mac, s, f) {
+          console.log('BL connecting...');
+          bluetoothSerial.connect('00:6A:8E:16:C8:EB', function(data) {
+            console.log('BL connect success');
+            console.log(JSON.stringify(data));
+          }, function(data) {
+            console.log('BL connect failed');
+            console.log(JSON.stringify(data));
+
+
+            // Attempt to reconnect once
+            bluetoothSerial.connect('00:6A:8E:16:C8:EB', function(data) {
+              console.log('reconnect succcess');
+              console.log(JSON.stringify(data));
+            }, function(data) {
+              console.log('reconnect failed');
+              console.log(JSON.stringify(data));
+            });
+          });
+      },
+
+      Write: function(data, s, f) {
+        console.log('writing...');
+        bluetoothSerial.write("hello", function(data) {
+          console.log('BL write success');
+          console.log(JSON.stringify(data));
+        }, function(data) {
+          console.log('BL write failed');
+          console.log(JSON.stringify(data));
+        });
+      },
+
+      Read: function(s, f) {
+       bluetoothSerial.read(function(data) {
+        console.log('BL read success');
+        console.log(JSON.stringify(data));
+       }, function(data) {
+        console.log('BL read failed');
+        console.log(JSON.stringify(data));
+       }); 
+      },
+
+      /*
+       * Lists paired devices
+       */
+      List: function(s, f) {
+        bluetoothSerial.list(function(data) {
+          console.log('BL list success');
+          console.log(JSON.stringify(data));
+        }, function(data) {
+          console.log('BL list failed');
+          console.log(JSON.stringify(data));
+        });
+      },
+
+      Subscribe: function() {
+        bluetoothSerial.subscribe('\n', function (data) {
+            console.log('BL subscribe success');
+            console.log(JSON.stringify(data));
+        }, function(data) {
+            console.log('BL subscribe fail');
+            console.log(JSON.stringify(data));
+        });
+      },
+
+      DiscoverUnpaired: function() {
+        bluetoothSerial.discoverUnpaired(function (data) {
+            console.log('BL discover unpaired success');
+            console.log(JSON.stringify(data));
+        }, function(data) {
+            console.log('BL discover unpaired fail');
+            console.log(JSON.stringify(data));
+        });
+      }
+    };
 });
