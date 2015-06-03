@@ -4,3 +4,11 @@
 node_modules/
 platforms/
 plugins/
+.idea/vcs.xml
+.idea/encodings.xml
+.idea/misc.xml
+.idea/.name
+.idea/modules.xml
+.idea/scopes/scope_settings.xml
+.idea/ikea-project.iml
+.idea/workspace.xml
