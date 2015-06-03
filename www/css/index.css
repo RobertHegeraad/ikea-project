@@ -1,12 +1,10 @@
-/* Z-INDEX --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-/* #splash:             100000000 */
-/* #modal:              10000000 */
-/* #header:             1000000 */
-/* #menu:               100000 */
-/* #modal-background:   10000 */
 
 body {
-    background-color: #cccccc;
+    background-color: #eeeeee;
+}
+
+ion-content {
+    background: #eeeeee;
 }
 
 
@@ -27,13 +25,17 @@ hr {
     font-size: 20px;
 }
 #genres li {
+    width: 50%;
     display: block;
-    padding: 20px 20px;
+    text-align: center;
+    float: left;
 
-    background-color: #ffffff;
-    border-bottom: 0.05em solid;
+/*    background-image: -moz-linear-gradient(top, #f9f9f9, #eeeeee);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0.00, #f9f9f9), color-stop(1.0, #eeeeee));*/
+    background-color: #fff;
+    border-bottom: 0.05em solid #dddddd;
 
-    border-color: #CCA646;
+    /*border-color: #CCA646;*/
 
     position: relative;
 }
@@ -44,6 +46,8 @@ hr {
 #genres li a {
     width: 100%;
     height: 100%;
+    padding: 10px 22px;
+
     display: block;
 }
 
@@ -52,6 +56,15 @@ hr {
     top: 34%;
     right: 10px;
     color: #428bca;
+}
+
+#genres li img {
+    width: 60px;
+    height: 60px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    position: relative;
+    top: 5px;
 }
 
 .title{
@@ -109,6 +122,7 @@ a{
         float: left;
         padding: 6px;
         margin: 14px 16px 0 0;
+        background-color: #eeeeee;
     }
         .product-switch select option {
             padding: 6px;
@@ -155,10 +169,37 @@ a{
         padding-right: 40px;
     }
 
+
+#lamp-btn {
+    min-width: 50px;
+    padding: 6px;
+    margin: 14px 0 0 4px;
+    text-align: center;
+
+    border-radius: 4px;
+
+    -webkit-transition: all 0.6s;
+    -moz-transition: all 0.6s;
+    -o-transition: all 0.6s;
+    -ms-transition: all 0.6s;
+    transition: all 0.6s;
+}
+    .lamp-btn-on {
+        background-color: #4FA0D6;
+        border: 1px solid #2180BF;
+        color: white;
+    }
+    .lamp-btn-off {
+        background-color: #eeeeee;
+        border: 1px solid #999;
+        color: #333333;
+    }
+
 select .color {
     width: 20px;
     height: 20px;
     background: red;
+    border: 1px solid #dbdbdb;
 }
 
 .product-info {
