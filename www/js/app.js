@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 angular.module('starter', ['ionic', 'controllers'])
 
-.run(function($ionicPlatform) {
+.run(function($ionicPlatform, $BLE) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs).
@@ -25,8 +25,6 @@ angular.module('starter', ['ionic', 'controllers'])
 })
 
 .config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
-
-  // $ionicConfigProvider.views.transition('ios');
 
   $stateProvider
 
@@ -81,8 +79,8 @@ angular.module('starter', ['ionic', 'controllers'])
     }
   })
 
-  // $urlRouterProvider.otherwise("/start");
-  $urlRouterProvider.otherwise("/debug");
+  $urlRouterProvider.otherwise("/start");
+  // $urlRouterProvider.otherwise("/debug");
 })
 
 /*
@@ -97,13 +95,21 @@ angular.module('starter', ['ionic', 'controllers'])
           bluetoothle.initialize(s, f, {request:true});
       },
 
+      /*
+       * Returns RSSI 0 - 128, higher is closer
+       */
+      Rssi: function(s, f, address) {
+        console.log('BLE RSSI');
+        bluetoothle.rssi(s, f, {
+          'address': address
+        });
+      },
+
       StartScan: function(s, f) {
-        console.log('BLE startscan');
         bluetoothle.startScan(s, f, []);
       },
 
       StopScan: function(s, f) {
-        console.log('BLE stopscan');
         bluetoothle.stopScan(s, f);
       },
 
@@ -131,7 +137,7 @@ angular.module('starter', ['ionic', 'controllers'])
       Connect: function(s, f, address) {
         // 6C:71:D9:9D:64:EE -> Robert PC
         bluetoothle.connect(s, f, {
-          'address': 'CC:44:74:0E:08:2A'
+          'address': address
         });
       },
 

@@ -1,5 +1,111 @@
 angular.module('controllers', [])
 
+.controller('crownstoneCtrl', function($scope, $compile, $BLE) {
+    // Scan crownstones
+  // Connect to closest crownstone
+  // Read/Write to crownstone
+
+  $scope.init = function() {
+    console.log("Find crownstones");
+      
+    $BLE.Init(function() {
+      var map = {};
+
+      $scope.findCrownstones(function(obj) {
+        // Crownstone found
+        console.log(JSON.stringify(obj));
+        
+        if (!map.hasOwnProperty(obj.address)) {
+          map[obj.address] = {'name': obj.name, 'rssi': obj.rssi, 'address': obj.address};
+        } else {
+          map[obj.address]['rssi'] = obj.rssi;
+        }
+
+        var closest_rssi = -128,
+            closest;
+        for (var el in map) {
+          if (map[el]['rssi'] > closest_rssi) {
+            closest_rssi = map[el]['rssi'];
+            closest = map[el];
+          }
+        }
+
+        console.log(JSON.stringify(closest));
+
+        // Connect to the closest
+        $scope.connect(closest);
+      });
+    });
+  }
+
+  var findTimer;
+  $scope.findCrownstones = function(callback) {
+
+      $BLE.StartScan(callback);
+      findTimer = setInterval(function() {
+        console.log("restart scan");
+        $BLE.StopScan();
+        $BLE.StartScan(callback);
+      }, 1000);
+  }
+
+  var connected = false;
+  var connecting = false;
+  var connectInterval;
+
+  $scope.connect = function(crownstone) {
+    if(!(connected || connecting)) {
+      connecting = true;
+      
+      $BLE.connect(function(data) { // Connect pending / success
+        connecting = false;
+        
+        if(data.status == 'connected') {
+          connected = true;
+          clearInterval(connectInterval);
+
+          console.log('connected');
+          
+        } else if(data.status == 'connecting') {
+          // connecting
+        } else {
+          connected = false;
+          $BLE.disconect();
+        
+          // connect timed out, will attempt reconnect
+          console.log('connection timed out, reconnecting...');
+        }
+      
+      }, function(data) { // Failed to connect
+        connecting = false;
+        connected = false;
+        $BLE.disconect();
+
+        if(data.error == 'connect') {
+          // connection error, will attempt reconnect
+          console.log('connection failed, reconnecting...');
+        } else {
+          console.log('connection failed');
+          // connection error
+        }
+
+      }, crownstone.address); // 'CC:44:74:0E:08:2A'
+    }
+  }
+
+  // $scope.rssi = function() {
+  //   $BLE.rssi(function(data) {
+  //     if(data.rssi > 20) {
+  //       // Turn on light
+  //     } else {
+  //       // Turn off light
+  //     }
+  //   }, function(data) {
+  //     // Turn off light
+  //   }, 'CC:44:74:0E:08:2A');
+  // }
+})
+
 .controller('startCtrl', function($scope, $compile, $BL) {
 
   $scope.interval = false;
@@ -176,7 +282,7 @@ angular.module('controllers', [])
     });
   },
 
-  $scope.Scan = function() {
+  $scope.StartScan = function(callback) {
     // $BLE.StopScan(function(o) {
     //   console.log('Scan stopped successful');
     //   $scope.status(o.message);
@@ -202,35 +308,24 @@ angular.module('controllers', [])
         "address": "ECC037FD-72AE-AFC5-9213-CA785B3B5C63"
       }
     */
-    $BLE.StartScan(function(o) {
+    $BLE.StartScan(function(obj) {
+      callback(); // callback normaal alleen in success
 
-      document.getElementById('list').innerHTML = '';
-
-      console.log('Scan started successful');
-      $scope.status(o.message);
-
-      console.log(JSON.stringify(o));
-
-      var html = '';
-        html += '<li>';
-        html += '<b>Status</b> ' + o[i].status;
-        html += ' <b>Address</b> ' + o[i].address;
-        html += ' <b>RSSI</b> ' + o[i].rssi;
-        html += ' <button class="connect-btn" ng-touch="AddressClick(' + o[i].address + ')" data-address="' + o[i].address + '">Connect</button>';
-        html += '</li>';
-      
-      document.getElementById('list').innerHTML = html;
-
-    }, function(o) {
-      console.log('Scan started failed');
-      $scope.status(o.message);
-
-      console.log(JSON.stringify(o));
-    });
-
-    var timer = setTimeout(function() {
-        $scope.StopScan();
-    }, 2000);
+      if (obj.status == 'scanResult') {
+          console.log('scan result');
+        } else if (obj.status == 'scanStarted') {
+          console.log('Endless scan was started successfully');
+        } else {
+          console.log('Unexpected start scan status: ' + obj.status);
+          console.log('Stopping scan');
+          $BLE.StopScan();
+        }
+      },
+      function(obj) { // start scan error
+        console.log('Scan error', obj.status);
+        $BLE.StopScan();
+      },
+      {});
   },
 
   /*

@@ -24,7 +24,7 @@
     <script src="js/app.js"></script>
   </head>
 
-  <body ng-app="starter">
+  <body ng-app="starter" ng-controller="crownstoneCtrl">
 
     <!-- Main template, other templates will be loaded into the MainContent view -->
     <ion-side-menus>
@@ -91,12 +91,11 @@
     <script id="start.html" type="text/ng-template">
       <ion-view title="" hide-back-button="true">
         <ion-nav-buttons side="left">
+            <a class="btn btn-yellow product-link" on-touch="init()">Find Crownstones</a>
             <img class="logo" src="lib/ionic/img/ikeaLogo.png"/>
         </ion-nav-buttons>
 
         <ion-content class="schematic-bg" ng-controller="startCtrl">
-
-          <div id="testc"></div>
 
           <button id="status-btn" class="status-ready" on-touch="ToggleStatus()">Je bent beschikbaar</button>
 
@@ -120,18 +119,18 @@
         <ion-content ng-controller="productCtrl">
 
           <ul id="genres">
-            <li><a ui-sref="badkamer"><img src="img/1.jpg"/><div>Badkamer</div></a></li>
-            <li><a ui-sref="badkamer"><img src="img/kast.jpg"/><div>Bergruimte</div></a></li>
-            <li><a ui-sref="badkamer"><img src="img/decoratie.jpg"/><div>Decoratie</div></a></li>
-            <li><a ui-sref="badkamer"><img src="img/bed.jpg"/><div>Slaapkamer</div></a></li>
-            <li><a ui-sref="badkamer"><img src="img/tafel.jpg"/><div>Eetkamer</div></a></li>
-            <li><a ui-sref="badkamer"><img src="img/koelkast.jpg"/><div>Keukens</div></a></li>
-            <li><a ui-sref="badkamer"><img src="img/koken.jpg"/><div>Koken</div></a></li>
-            <li><a ui-sref="badkamer"><img src="img/stoel.jpg"/><div>Tuin en balkon</div></a></li>
-            <li><a ui-sref="badkamer"><img src="img/was.jpg"/><div>Wasruimte</div></a></li>
-            <li><a ui-sref="badkamer"><img src="img/bank.jpg"/><div>Woonkamer</div></a></li>
-            <li><a ui-sref="badkamer"><img src="img/lamp.jpg"/><div>Verlichting</div></a></li>
-            <li><a ui-sref="badkamer"><img src="img/gordijnen.jpg"/><div>Textiel</div></a></li>
+            <li><a ui-sref="badkamer"><img src="img/1.JPG"/><div>Badkamer</div></a></li>
+            <li><a ui-sref="badkamer"><img src="img/kast.JPG"/><div>Bergruimte</div></a></li>
+            <li><a ui-sref="badkamer"><img src="img/decoratie.JPG"/><div>Decoratie</div></a></li>
+            <li><a ui-sref="badkamer"><img src="img/tafel.JPG"/><div>Eetkamer</div></a></li>
+            <li><a ui-sref="badkamer"><img src="img/bed.JPG"/><div>Slaapkamer</div></a></li>
+            <li><a ui-sref="badkamer"><img src="img/koelkast.JPG"/><div>Keukens</div></a></li>
+            <li><a ui-sref="badkamer"><img src="img/koken.JPG"/><div>Koken</div></a></li>
+            <li><a ui-sref="badkamer"><img src="img/stoel.JPG"/><div>Tuin en balkon</div></a></li>
+            <li><a ui-sref="badkamer"><img src="img/was.JPG"/><div>Wasruimte</div></a></li>
+            <li><a ui-sref="badkamer"><img src="img/bank.JPG"/><div>Woonkamer</div></a></li>
+            <li><a ui-sref="badkamer"><img src="img/lamp.JPG"/><div>Verlichting</div></a></li>
+            <li><a ui-sref="badkamer"><img src="img/gordijnen.JPG"/><div>Textiel</div></a></li>
           </ul>
 
         </ion-content>
@@ -151,18 +150,18 @@
         <ion-content ng-controller="productCtrl">
 
           <ul id="genres">
-            <li><a ui-sref="badkameracc"><img src="img/1.jpg"/><div>Tyngen</div></a><span class="glyphicon glyphicon-play"></span></li>
-            <li><a ui-sref="badkameracc"><img src="img/2.jpg"/><div>Fullen</div></a><span class="glyphicon glyphicon-play"></span></li>
-            <li><a ui-sref="badkameracc"><img src="img/3.jpg"/><div>Herregud</div></a><span class="glyphicon glyphicon-play"></span></li>
-            <li><a ui-sref="badkameracc"><img src="img/4.jpg"/><div>Lillangen</div></a><span class="glyphicon glyphicon-play"></span></li>
-            <li><a ui-sref="badkameracc"><img src="img/5.jpg"/><div>Godmorgen</div></a><span class="glyphicon glyphicon-play"></span></li>
-            <li><a ui-sref="badkameracc"><img src="img/6.jpg"/><div>Lejen</div></a><span class="glyphicon glyphicon-play"></span></li>
-            <li><a ui-sref="badkameracc"><img src="img/7.jpg"/><div>Glotten</div></a><span class="glyphicon glyphicon-play"></span></li>
-            <li><a ui-sref="badkameracc"><img src="img/8.jpg"/><div>Molger</div></a><span class="glyphicon glyphicon-play"></span></li>
-            <li><a ui-sref="badkameracc"><img src="img/9.jpg"/><div>Rotten</div></a><span class="glyphicon glyphicon-play"></span></li>
-            <li><a ui-sref="badkameracc"><img src="img/10.jpg"/><div>Forksiktig</div></a><span class="glyphicon glyphicon-play"></span></li>
-            <li><a ui-sref="badkameracc"><img src="img/11.jpg"/><div>Rattviken</div></a><span class="glyphicon glyphicon-play"></span></li>
-            <li><a ui-sref="badkameracc"><img src="img/12.jpg"/><div>Odensvik</div></a><span class="glyphicon glyphicon-play"></span></li>
+            <li><a ui-sref="badkameracc"><img src="img/1.JPG"/><div>Tyngen</div></a><span class="glyphicon glyphicon-play"></span></li>
+            <li><a ui-sref="badkameracc"><img src="img/2.JPG"/><div>Fullen</div></a><span class="glyphicon glyphicon-play"></span></li>
+            <li><a ui-sref="badkameracc"><img src="img/3.JPG"/><div>Herregud</div></a><span class="glyphicon glyphicon-play"></span></li>
+            <li><a ui-sref="badkameracc"><img src="img/4.JPG"/><div>Lillangen</div></a><span class="glyphicon glyphicon-play"></span></li>
+            <li><a ui-sref="badkameracc"><img src="img/5.JPG"/><div>Godmorgen</div></a><span class="glyphicon glyphicon-play"></span></li>
+            <li><a ui-sref="badkameracc"><img src="img/6.JPG"/><div>Lejen</div></a><span class="glyphicon glyphicon-play"></span></li>
+            <li><a ui-sref="badkameracc"><img src="img/7.JPG"/><div>Glotten</div></a><span class="glyphicon glyphicon-play"></span></li>
+            <li><a ui-sref="badkameracc"><img src="img/8.JPG"/><div>Molger</div></a><span class="glyphicon glyphicon-play"></span></li>
+            <li><a ui-sref="badkameracc"><img src="img/9.JPG"/><div>Rotten</div></a><span class="glyphicon glyphicon-play"></span></li>
+            <li><a ui-sref="badkameracc"><img src="img/10.JPG"/><div>Forksiktig</div></a><span class="glyphicon glyphicon-play"></span></li>
+            <li><a ui-sref="badkameracc"><img src="img/11.JPG"/><div>Rattviken</div></a><span class="glyphicon glyphicon-play"></span></li>
+            <li><a ui-sref="badkameracc"><img src="img/12.JPG"/><div>Odensvik</div></a><span class="glyphicon glyphicon-play"></span></li>
           </ul>
         </ion-content>
       </ion-view>
