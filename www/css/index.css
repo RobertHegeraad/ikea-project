@@ -21,6 +21,19 @@ hr {
 /* IKEA blue: #003399; */
 /* IKEA yellow: #FFCC00; */
 
+.light-bulb {
+    width: 100%;
+    height: 600px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url('../lib/ionic/img/lightbulb_off.png');
+}
+.light-bulb-on {
+    background-image: url('../lib/ionic/img/lightbulb_on.png');
+
+}
+
+
 #genres{
     font-size: 20px;
 }

@@ -5,6 +5,27 @@ angular.module('controllers', [])
   // Connect to closest crownstone
   // Read/Write to crownstone
 
+    // Power Service
+  var powerServiceUuid =                       '5b8d0000-6f20-11e4-b116-123b93f75cba';
+  // Power Service - Characteristics
+  var pwmUuid =                                '5b8d0001-6f20-11e4-b116-123b93f75cba';
+  var sampleCurrentUuid =                      '5b8d0002-6f20-11e4-b116-123b93f75cba';
+  var currentCurveUuid =                       '5b8d0003-6f20-11e4-b116-123b93f75cba';
+  var currentConsumptionUuid =                 '5b8d0004-6f20-11e4-b116-123b93f75cba';
+  var currentLimitUuid =                       '5b8d0005-6f20-11e4-b116-123b93f75cba';
+
+  $scope.TogglePower = function() {
+    $('.light-bulb').toggleClass('light-bulb-on');
+  }
+
+  $scope.PowerOn = function() {
+    $('.light-bulb').addClass('light-bulb-on');
+  }
+
+  $scope.PowerOff = function() {
+    $('.light-bulb').removeClass('light-bulb-on');
+  }
+
   $scope.init = function() {
     console.log("Find crownstones");
       
@@ -15,25 +36,28 @@ angular.module('controllers', [])
         // Crownstone found
         console.log(JSON.stringify(obj));
         
-        if (!map.hasOwnProperty(obj.address)) {
+        if(obj.status != "scanStarted") {
           map[obj.address] = {'name': obj.name, 'rssi': obj.rssi, 'address': obj.address};
-        } else {
-          map[obj.address]['rssi'] = obj.rssi;
-        }
 
-        var closest_rssi = -128,
-            closest;
-        for (var el in map) {
-          if (map[el]['rssi'] > closest_rssi) {
-            closest_rssi = map[el]['rssi'];
-            closest = map[el];
+          var closest_rssi = -128,
+              closest;
+          for (var el in map) {
+            console.log(el);
+            if (map[el]['rssi'] > closest_rssi) {
+              closest_rssi = map[el]['rssi'];
+              closest = map[el];
+            }
           }
+
+          $BLE.StopScan();
+          clearInterval(findTimer);
+
+          console.log('CLOSEST');
+          console.log(JSON.stringify(closest));
+
+          // Connect to the closest
+          $scope.connect(closest);
         }
-
-        console.log(JSON.stringify(closest));
-
-        // Connect to the closest
-        $scope.connect(closest);
       });
     });
   }
@@ -46,64 +70,186 @@ angular.module('controllers', [])
         console.log("restart scan");
         $BLE.StopScan();
         $BLE.StartScan(callback);
-      }, 1000);
+      }, 2000);
+  }
+
+  $scope.stopSearching = function() {
+    $BLE.StopScan();
+    $BLE.Disconnect();
+    clearInterval(findTimer);
   }
 
   var connected = false;
   var connecting = false;
   var connectInterval;
-
   $scope.connect = function(crownstone) {
     if(!(connected || connecting)) {
       connecting = true;
-      
-      $BLE.connect(function(data) { // Connect pending / success
+
+      // var paramsObj = {"address": crownstone.address};
+      var paramsObj = {"address": 'CC:44:74:0E:08:2A'};
+      // var paramsObj = {"address": '9C:D3:5B:1D:11:14'};
+
+      $BLE.Connect(function(data) { // Connect pending / success
         connecting = false;
-        
+
         if(data.status == 'connected') {
           connected = true;
           clearInterval(connectInterval);
 
           console.log('connected');
+
+          // Alleen voor test power
+            // $scope.writePWM(address, 255, function() {
+            //   console.log('written 255');
+            // }, function() {
+            //   console.log('failed to write 255');
+            // });
+
+          // Alleen voor sprint demo
+          $scope.watchRssi(paramsObj.address);
+
+
+          // Discover services --------------------------------------------------------
+          // $scope.discoverServices(function(obj) {
+          //   // obj.services // array
+          //   // serviceUuid, characteristicUuid
+          //   if(obj.status == 'discovered') {
+          //     console.log('discovering services success');
+
+          //     console.log(JSON.stringify(obj.services));
+
+
+          //     var services = obj.services;
+          //     for (var i = 0; i < services.length; ++i) {
+          //       var serviceUuid = services[i].serviceUuid;
+          //       var characteristics = services[i].characteristics;
+          //       for (var j = 0; j < characteristics.length; ++j) {
+          //         var characteristicUuid = characteristics[j].characteristicUuid;
+          //         console.log("Found service " + serviceUuid + " with characteristic " + characteristicUuid);
+
+          //         if (serviceUuid == powerServiceUuid) {
+          //           if (characteristicUuid == pwmUuid) {
+          //             console.log('Able to sent power');
+
+          //             // $scope.watchRssi(data.address);
+          //           }
+          //         }
+          //       }
+          //     }
+          //   } else {
+          //     console.log('failed to discover services');              
+          //   }
+          // }, function(obj) {
+          //   console.log('discovering services error: ' + obj.error + ' message: ' + obj.message);
+          // }, paramsObj.address);
           
         } else if(data.status == 'connecting') {
           // connecting
         } else {
           connected = false;
-          $BLE.disconect();
+          $BLE.Disconnect();
         
           // connect timed out, will attempt reconnect
           console.log('connection timed out, reconnecting...');
+          // $scope.connect(crownstone);
+          return;
         }
       
       }, function(data) { // Failed to connect
         connecting = false;
         connected = false;
-        $BLE.disconect();
+        $BLE.Disconnect();
 
         if(data.error == 'connect') {
           // connection error, will attempt reconnect
           console.log('connection failed, reconnecting...');
+
+          setTimeout(function() {
+            $scope.connect(crownstone);
+          }, 2000);
+          return;
         } else {
           console.log('connection failed');
           // connection error
         }
 
-      }, crownstone.address); // 'CC:44:74:0E:08:2A'
+      }, paramsObj.address); // 'CC:44:74:0E:08:2A' = crownstone
     }
   }
 
-  // $scope.rssi = function() {
-  //   $BLE.rssi(function(data) {
-  //     if(data.rssi > 20) {
-  //       // Turn on light
-  //     } else {
-  //       // Turn off light
-  //     }
-  //   }, function(data) {
-  //     // Turn off light
-  //   }, 'CC:44:74:0E:08:2A');
-  // }
+  var rssiInterval;
+  $scope.watchRssi = function(address) {
+    // if(connected) {
+      setInterval(function() {
+        $BLE.Rssi(function(data) {
+          console.log('rssi success');
+          console.log(JSON.stringify(data));
+          // console.log(data.rssi);
+          if(data.rssi < 0 && data.rssi > -60) { // goede waarde?? // -60 = ~20cm
+            // Turn on light
+            $scope.PowerOn();
+
+            // $scope.writePWM(address, 255, function() {
+            //   console.log('written 255');
+            // }, function() {
+            //   console.log('failed to write 255');
+            // });
+
+          } else {  // Restart scan??
+            // Turn off light
+            $scope.PowerOff();
+          
+            // $scope.writePWM(address, 0, function() {
+            //   console.log('written 0');
+            // }, function() {
+            //   console.log('failed to write 0');
+            // });
+          }
+        }, function(data) {
+          console.log('rssi failed');
+          console.log(JSON.stringify(data));
+          // Turn off light
+            $scope.PowerOff();
+
+          // $scope.writePWM(address, 0, function() {
+          //   console.log('written 0');
+          // }, function() {
+          //     console.log('failed to write 0');
+          // });
+        }, address); 
+      }, 4000);
+    // }
+  }
+
+  $scope.writePWM = function(address, value, successCB, errorCB) {
+    var u8 = new Uint8Array(1);
+    u8[0] = value;
+    var v = $BLE.BytesToEncodedString(u8);
+    console.log("Write " + v + " at service " + powerServiceUuid + ' and characteristic ' + pwmUuid + ' to address ' + address);
+    var paramsObj = {"address": address, "serviceUuid": powerServiceUuid, "characteristicUuid": pwmUuid , "value" : v};
+    $BLE.Write(function(obj) { // write success
+        if (obj.status == 'written') {
+          console.log('Successfully written to pwm characteristic - ' + obj.status);
+
+          if (successCB) successCB();
+        } else {
+          console.log('Writing to pwm characteristic was not successful' + obj);
+
+          if (errorCB) errorCB();
+        }
+      },
+      function(obj) { // write error
+        console.log("Error in writing to pwm characteristic: " + obj.error + " - " + obj.message);
+
+        if (errorCB) errorCB();
+      },
+      paramsObj);
+  }
+
+  $scope.discoverServices = function(s, f, address) {
+    $BLE.DiscoverServices(s, f, address);
+  }
 })
 
 .controller('startCtrl', function($scope, $compile, $BL) {

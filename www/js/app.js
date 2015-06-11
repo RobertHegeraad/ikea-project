@@ -28,17 +28,20 @@ angular.module('starter', ['ionic', 'controllers'])
 
   $stateProvider
 
-  // .state('app', {
-  //   url: "/app",
-  //   abstract: true,
-  //   templateUrl: "menu.html"
-  // })
-
   .state('debug', {
     url: '/debug',
     views: {
       'MainContent': {
         templateUrl: 'debug.html'
+      }
+    }
+  })
+
+  .state('light', {
+    url: '/light',
+    views: {
+      'MainContent': {
+        templateUrl: 'light.html'
       }
     }
   })
@@ -90,9 +93,34 @@ angular.module('starter', ['ionic', 'controllers'])
  */
 .factory('$BLE', function($rootScope) {
     return {
+
+      // Power Service
+      powerServiceUuid:                       '5b8d0000-6f20-11e4-b116-123b93f75cba',
+      // Power Service - Characteristics
+      pwmUuid:                                '5b8d0001-6f20-11e4-b116-123b93f75cba',
+      sampleCurrentUuid:                      '5b8d0002-6f20-11e4-b116-123b93f75cba',
+      currentCurveUuid:                       '5b8d0003-6f20-11e4-b116-123b93f75cba',
+      currentConsumptionUuid:                 '5b8d0004-6f20-11e4-b116-123b93f75cba',
+      currentLimitUuid:                       '5b8d0005-6f20-11e4-b116-123b93f75cba',
+
       Init: function(s, f) {
           console.log('BLE init');
           bluetoothle.initialize(s, f, {request:true});
+      },
+
+      DiscoverServices: function(s, f, address) {
+        bluetoothle.discover(s, f, {
+          'address': address
+        });
+      },
+
+      // value 0 - 255
+      BytesToEncodedString: function(u8, value) {
+        return bluetoothle.bytesToEncodedString(u8);
+      },
+
+      Write: function(s, f, params) {
+        bluetoothle.write(s, f, params);
       },
 
       /*
@@ -168,10 +196,10 @@ angular.module('starter', ['ionic', 'controllers'])
       /*
        * Check if a device is connected
        */
-      IsConnected: function() {
+      IsConnected: function(address) {
         var connected;
-        return bluetoothle.isConnected(connected, {
-          "address": "6C:71:D9:9D:64:EE"
+        bluetoothle.isConnected(connected, {
+          "address": address
         });
         return connected;
       }
