@@ -18,6 +18,9 @@ hr {
 }
 
 
+
+
+
 /* IKEA blue: #003399; */
 /* IKEA yellow: #FFCC00; */
 
@@ -501,6 +504,7 @@ select .color {
 #notice {
     width: 300px;
 
+    margin-top: 10px;
     margin-left: -150px;
     
     text-align: center;
@@ -509,7 +513,7 @@ select .color {
     box-sizing: border-box;
     
     position: fixed;
-    top: 8%;
+    top: 20%;
     left: 50%;
 
     z-index: 10000;
@@ -984,6 +988,40 @@ input[type=radio]:checked + .radio {
 .btn-loading .btn-spinner {
     opacity: 1;
 }
+
+
+/* NOTICES ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+#notice {
+    width: 300px;
+
+    margin-left: -150px;
+    
+    text-align: center;
+    color: #444444;
+
+    box-sizing: border-box;
+    
+    position: fixed;
+    top: 8%;
+    left: 50%;
+
+    z-index: 10000;
+
+    /*background-color: rgba(237, 97, 97, 0.8); error*/
+    background-color: rgba(249, 237, 190, 0.8);
+    
+    border: 1px solid #f0c36d;
+    
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+
+    display: none;
+}
+    #notice div {
+        padding: 10px;
+    }
 
 
 /* SPINNER ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */

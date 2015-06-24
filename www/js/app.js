@@ -161,6 +161,7 @@ angular.module('starter', ['ionic', 'controllers'])
 
       /*
        * t5 CC:44:74:0E:08:2A
+       * t5 CE:9E:48:0E:7C:52
        */
       Connect: function(s, f, address) {
         // 6C:71:D9:9D:64:EE -> Robert PC
@@ -346,6 +347,69 @@ angular.module('starter', ['ionic', 'controllers'])
 
 
       return methods;
+})
+
+/* ----------------------------------------------------------------------------------------
+ * NOTICES
+ *
+ * Notices for user
+ */
+.factory('$notice', function() {
+
+  return {    
+    /*
+     * Check if there is a notice from a previous page
+     *
+     * @param The number of miliseconds to show the flash notice
+     */
+    check: function(ms) {
+        if(store.has('notice')) {
+            this.show(store.get('notice'), ms);
+            store.remove('notice');
+        }
+    },
+
+    /*
+     * Set a notice for the next page (slide/redirect)
+     *
+     * @param A language string form the ./locale folder
+     */
+    flash: function(string) {
+        store.set('notice', string);
+    },
+
+    /*
+     * Show a notice for a few seconds
+     *
+     * @param A language string from the ./locale folder
+     * @param The number of miliseconds the notice is visible
+     */
+    show: function(string, ms) {
+        ms = ms || 2000;
+
+        var $notice = $('#notice');
+
+        $notice.html('<div>' + string + '</div>').fadeIn(400);
+
+        setTimeout(function() {
+            $notice.fadeOut(400);
+        }, ms);
+    },
+
+    /*
+     * Show a notice that can't be closed
+     *
+     * @param A language string form the ./locale folder
+     */
+    stick: function(string) {
+        $('#notice').html('<div>' + string + '</div>').fadeIn(400).addClass('pulse');
+    },
+
+    /*
+     * Close a notice
+     */
+    close: function() {
+        $('#notice').fadeOut(400);
+    }
+  };
 });
-
-

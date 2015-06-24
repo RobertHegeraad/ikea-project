@@ -74,9 +74,11 @@ angular.module('controllers', [])
   }
 
   $scope.stopSearching = function() {
+    console.log('stop searching');
     $BLE.StopScan();
     $BLE.Disconnect();
     clearInterval(findTimer);
+    clearInterval(rssiInterval);
   }
 
   var connected = false;
@@ -87,7 +89,7 @@ angular.module('controllers', [])
       connecting = true;
 
       // var paramsObj = {"address": crownstone.address};
-      var paramsObj = {"address": 'CC:44:74:0E:08:2A'};
+      var paramsObj = {"address": 'CE:9E:48:0E:7C:52'};
       // var paramsObj = {"address": '9C:D3:5B:1D:11:14'};
 
       $BLE.Connect(function(data) { // Connect pending / success
@@ -99,50 +101,40 @@ angular.module('controllers', [])
 
           console.log('connected');
 
-          // Alleen voor test power
-            // $scope.writePWM(address, 255, function() {
-            //   console.log('written 255');
-            // }, function() {
-            //   console.log('failed to write 255');
-            // });
-
-          // Alleen voor sprint demo
-          $scope.watchRssi(paramsObj.address);
-
 
           // Discover services --------------------------------------------------------
-          // $scope.discoverServices(function(obj) {
-          //   // obj.services // array
-          //   // serviceUuid, characteristicUuid
-          //   if(obj.status == 'discovered') {
-          //     console.log('discovering services success');
+          $scope.discoverServices(function(obj) {
+            // obj.services // array
+            // serviceUuid, characteristicUuid
+            if(obj.status == 'discovered') {
+              console.log('discovering services success');
 
-          //     console.log(JSON.stringify(obj.services));
+              console.log(JSON.stringify(obj.services));
 
 
-          //     var services = obj.services;
-          //     for (var i = 0; i < services.length; ++i) {
-          //       var serviceUuid = services[i].serviceUuid;
-          //       var characteristics = services[i].characteristics;
-          //       for (var j = 0; j < characteristics.length; ++j) {
-          //         var characteristicUuid = characteristics[j].characteristicUuid;
-          //         console.log("Found service " + serviceUuid + " with characteristic " + characteristicUuid);
+              var services = obj.services;
+              for (var i = 0; i < services.length; ++i) {
+                var serviceUuid = services[i].serviceUuid;
+                var characteristics = services[i].characteristics;
+                for (var j = 0; j < characteristics.length; ++j) {
+                  var characteristicUuid = characteristics[j].characteristicUuid;
+                  console.log("Found service " + serviceUuid + " with characteristic " + characteristicUuid);
 
-          //         if (serviceUuid == powerServiceUuid) {
-          //           if (characteristicUuid == pwmUuid) {
-          //             console.log('Able to sent power');
+                  if (serviceUuid == powerServiceUuid) {
+                    if (characteristicUuid == pwmUuid) {
+                      console.log('Able to sent power');
 
-          //             // $scope.watchRssi(data.address);
-          //           }
-          //         }
-          //       }
-          //     }
-          //   } else {
-          //     console.log('failed to discover services');              
-          //   }
-          // }, function(obj) {
-          //   console.log('discovering services error: ' + obj.error + ' message: ' + obj.message);
-          // }, paramsObj.address);
+                      $scope.watchRssi(data.address);
+                    }
+                  }
+                }
+              }
+            } else {
+              console.log('failed to discover services');              
+            }
+          }, function(obj) {
+            console.log('discovering services error: ' + obj.error + ' message: ' + obj.message);
+          }, paramsObj.address);
           
         } else if(data.status == 'connecting') {
           // connecting
@@ -174,37 +166,49 @@ angular.module('controllers', [])
           // connection error
         }
 
-      }, paramsObj.address); // 'CC:44:74:0E:08:2A' = crownstone
+      }, paramsObj.address); // 'CE:9E:48:0E:7C:52' = crownstone
     }
   }
 
   var rssiInterval;
+  var latest;
   $scope.watchRssi = function(address) {
     // if(connected) {
       setInterval(function() {
         $BLE.Rssi(function(data) {
+
+          $('#rssi').html(data.rssi);
+
           console.log('rssi success');
           console.log(JSON.stringify(data));
           // console.log(data.rssi);
-          if(data.rssi < 0 && data.rssi > -60) { // goede waarde?? // -60 = ~20cm
-            // Turn on light
-            $scope.PowerOn();
 
-            // $scope.writePWM(address, 255, function() {
-            //   console.log('written 255');
-            // }, function() {
-            //   console.log('failed to write 255');
-            // });
+          latest = data.rssi;
+
+          if(data.rssi > -60) { // -60 = ~20cm??
+
+            if(latest >= data.rssi) {
+              // Turn on light
+              $scope.PowerOn();
+
+              $scope.writePWM(address, 255, function() {
+                console.log('written 255');
+              }, function() {
+                console.log('failed to write 255');
+              });
+            }
 
           } else {  // Restart scan??
             // Turn off light
             $scope.PowerOff();
-          
-            // $scope.writePWM(address, 0, function() {
-            //   console.log('written 0');
-            // }, function() {
-            //   console.log('failed to write 0');
-            // });
+
+            if(latest <= data.rssi) {
+              $scope.writePWM(address, 0, function() {
+                console.log('written 0');
+              }, function() {
+                console.log('failed to write 0');
+              });
+            }
           }
         }, function(data) {
           console.log('rssi failed');
@@ -212,11 +216,11 @@ angular.module('controllers', [])
           // Turn off light
             $scope.PowerOff();
 
-          // $scope.writePWM(address, 0, function() {
-          //   console.log('written 0');
-          // }, function() {
-          //     console.log('failed to write 0');
-          // });
+          $scope.writePWM(address, 0, function() {
+            console.log('written 0');
+          }, function() {
+              console.log('failed to write 0');
+          });
         }, address); 
       }, 4000);
     // }
@@ -252,7 +256,16 @@ angular.module('controllers', [])
   }
 })
 
-.controller('startCtrl', function($scope, $compile, $BL) {
+.controller('startCtrl', function($scope, $compile, $BL, $BLE) {
+
+  // Power Service
+  var powerServiceUuid =                       '5b8d0000-6f20-11e4-b116-123b93f75cba';
+  // Power Service - Characteristics
+  var pwmUuid =                                '5b8d0001-6f20-11e4-b116-123b93f75cba';
+  var sampleCurrentUuid =                      '5b8d0002-6f20-11e4-b116-123b93f75cba';
+  var currentCurveUuid =                       '5b8d0003-6f20-11e4-b116-123b93f75cba';
+  var currentConsumptionUuid =                 '5b8d0004-6f20-11e4-b116-123b93f75cba';
+  var currentLimitUuid =                       '5b8d0005-6f20-11e4-b116-123b93f75cba';
 
   $scope.interval = false;
 
@@ -273,6 +286,31 @@ angular.module('controllers', [])
 
   // setInterval($scope.Notify, 2000);
 
+  $scope.writePWM = function(address, value, successCB, errorCB) {
+    var u8 = new Uint8Array(1);
+    u8[0] = value;
+    var v = $BLE.BytesToEncodedString(u8);
+    console.log("Write " + v + " at service " + powerServiceUuid + ' and characteristic ' + pwmUuid + ' to address ' + address);
+    var paramsObj = {"address": address, "serviceUuid": powerServiceUuid, "characteristicUuid": pwmUuid , "value" : v};
+    $BLE.Write(function(obj) { // write success
+        if (obj.status == 'written') {
+          console.log('Successfully written to pwm characteristic - ' + obj.status);
+
+          if (successCB) successCB();
+        } else {
+          console.log('Writing to pwm characteristic was not successful' + obj);
+
+          if (errorCB) errorCB();
+        }
+      },
+      function(obj) { // write error
+        console.log("Error in writing to pwm characteristic: " + obj.error + " - " + obj.message);
+
+        if (errorCB) errorCB();
+      },
+      paramsObj);
+  }
+
 
   $scope.ReadEmployee = function() {
     $BL.Read(function(data) {
@@ -290,10 +328,15 @@ angular.module('controllers', [])
         console.log('data undefined');
       }
     }, function(data) {
-      console.log('Read fail');
+      console.log('Read fail, turn on lamp');
       console.log(JSON.stringify(data));
+      // turn on
+      
+      $scope.TurnOn();
 
-      // turn off
+      $statusBtn.removeClass('status-busy');
+      $statusBtn.addClass('status-ready');
+      $statusBtn.html('Je bent beschikbaar');
     });
 
     // Clear the previous interval
@@ -334,7 +377,7 @@ angular.module('controllers', [])
     }, function(data) {
       // init fail
     });
-  },
+  }
 
   $scope.ToggleStatus = function() {
     var $statusBtn = $('#status-btn');
@@ -344,14 +387,40 @@ angular.module('controllers', [])
       $statusBtn.addClass('status-busy');
       $statusBtn.html('Je bent bezig');
 
+      $scope.TurnOff();
+
       // var $el = $('<li><button class="btn connect-btn" data-ng-click="AddressClick($event)" data-address="test">Connect</button></li>').appendTo('#testc');
       // $compile($el)($scope);
     } else {
       $statusBtn.removeClass('status-busy');
       $statusBtn.addClass('status-ready');
       $statusBtn.html('Je bent beschikbaar');
+
+      $scope.TurnOn();
     }
-  },
+  }
+
+  $scope.TurnOn = function() {
+    // turn off
+    $BLE.Init(function() {
+      $scope.writePWM('CE:9E:48:0E:7C:52', 255, function() {
+        console.log('written 255');
+      }, function() {
+          console.log('failed to write 255');
+      });
+    });
+  }
+
+  $scope.TurnOff = function() {
+    // turn off
+    $BLE.Init(function() {
+      $scope.writePWM('CE:9E:48:0E:7C:52', 0, function() {
+        console.log('written 0');
+      }, function() {
+          console.log('failed to write 0');
+      });
+    });
+  }
 
   $scope.AddressClick = function($event) {
     var $target = $event.target;
@@ -360,7 +429,158 @@ angular.module('controllers', [])
   }
 })
 
-.controller('productCtrl', function($scope) {
+// 
+
+.controller('productCtrl', function($scope, $BLE, $notice) {
+
+  $scope.chosenColor = 'red';
+
+  // Connect to the target crownstone and power the lamp
+
+  var connected = false;
+  var connecting = false;
+  var connectInterval;
+  $scope.connect = function(crownstone) {
+    if(!(connected || connecting)) {
+      connecting = true;
+
+      // var paramsObj = {"address": crownstone.address};
+      var paramsObj = {"address": 'CE:9E:48:0E:7C:52'};
+
+      $BLE.StopScan();
+      $BLE.Disconnect();
+
+      $BLE.Connect(function(data, toggle) { // Connect pending / success
+        connecting = false;
+
+        if(data.status == 'connected') {
+          connected = true;
+          clearInterval(connectInterval);
+
+          console.log('connected');
+
+
+          // Discover services --------------------------------------------------------
+          $scope.discoverServices(function(obj) {
+            // obj.services // array
+            // serviceUuid, characteristicUuid
+            if(obj.status == 'discovered') {
+              console.log('discovering services success');
+
+              console.log(JSON.stringify(obj.services));
+
+
+              var services = obj.services;
+              for (var i = 0; i < services.length; ++i) {
+                var serviceUuid = services[i].serviceUuid;
+                var characteristics = services[i].characteristics;
+                for (var j = 0; j < characteristics.length; ++j) {
+                  var characteristicUuid = characteristics[j].characteristicUuid;
+                  console.log("Found service " + serviceUuid + " with characteristic " + characteristicUuid);
+
+                  if (serviceUuid == powerServiceUuid) {
+                    if (characteristicUuid == pwmUuid) {
+                      console.log('Able to sent power');
+
+                      // Color meesturen?
+
+                      if(toggle === true) {
+                        $scope.writePWM(address, 255, function() {
+                          console.log('written 255');
+                        }, function() {
+                            console.log('failed to write 255');
+                        });
+                      } else {
+                        $scope.writePWM(address, 0, function() {
+                          console.log('written 0');
+                        }, function() {
+                            console.log('failed to write 0');
+                        });
+                      }
+
+
+                    }
+                  }
+                }
+              }
+            } else {
+              console.log('failed to discover services');
+            }
+          }, function(obj) {
+            console.log('discovering services error: ' + obj.error + ' message: ' + obj.message);
+          }, paramsObj.address);
+          
+        } else if(data.status == 'connecting') {
+          // connecting
+        } else {
+          connected = false;
+          $BLE.Disconnect();
+        
+          // connect timed out, will attempt reconnect
+          console.log('connection timed out, reconnecting...');
+          // $scope.connect(crownstone);
+          return;
+        }
+      
+      }, function(data) { // Failed to connect
+        connecting = false;
+        connected = false;
+        $BLE.Disconnect();
+
+        if(data.error == 'connect') {
+          // connection error, will attempt reconnect
+          console.log('connection failed, reconnecting...');
+
+          setTimeout(function() {
+            $scope.connect(crownstone);
+          }, 2000);
+          return;
+        } else {
+          console.log('connection failed');
+          // connection error
+        }
+
+      }, paramsObj.address); // 'CE:9E:48:0E:7C:52' = crownstone
+    }
+  }
+
+  // Power Service
+  var powerServiceUuid =                       '5b8d0000-6f20-11e4-b116-123b93f75cba';
+  // Power Service - Characteristics
+  var pwmUuid =                                '5b8d0001-6f20-11e4-b116-123b93f75cba';
+  var sampleCurrentUuid =                      '5b8d0002-6f20-11e4-b116-123b93f75cba';
+  var currentCurveUuid =                       '5b8d0003-6f20-11e4-b116-123b93f75cba';
+  var currentConsumptionUuid =                 '5b8d0004-6f20-11e4-b116-123b93f75cba';
+  var currentLimitUuid =                       '5b8d0005-6f20-11e4-b116-123b93f75cba';
+
+  $scope.writePWM = function(address, value, successCB, errorCB) {
+    var u8 = new Uint8Array(1);
+    u8[0] = value;
+    var v = $BLE.BytesToEncodedString(u8);
+    console.log("Write " + v + " at service " + powerServiceUuid + ' and characteristic ' + pwmUuid + ' to address ' + address);
+    var paramsObj = {"address": address, "serviceUuid": powerServiceUuid, "characteristicUuid": pwmUuid , "value" : v};
+    $BLE.Write(function(obj) { // write success
+        if (obj.status == 'written') {
+          console.log('Successfully written to pwm characteristic - ' + obj.status);
+
+          if (successCB) successCB();
+        } else {
+          console.log('Writing to pwm characteristic was not successful' + obj);
+
+          if (errorCB) errorCB();
+        }
+      },
+      function(obj) { // write error
+        console.log("Error in writing to pwm characteristic: " + obj.error + " - " + obj.message);
+
+        if (errorCB) errorCB();
+      },
+      paramsObj);
+  }
+
+  $scope.discoverServices = function(s, f, address) {
+    $BLE.DiscoverServices(s, f, address);
+  }
 
   $scope.color = function() {
 
@@ -368,35 +588,64 @@ angular.module('controllers', [])
   },
 
   $scope.setColor = function(color, $event) {
+    $scope.chosenColor = color;
     $('.color-picker-toggle').css('backgroundColor', color);
     $('#color-picker').fadeOut(200);
   },
 
   $scope.onToggle = function(value) {
 
-    // <ion-toggle id="toggle" ng-model="toggle" id="toggle" toggle-class="toggle-calm" ng-change="onToggle(toggle)"></ion-toggle>
-
-    console.log('lamp toggle');
-    
-    // if(value === true) {
-    //   $('#toggle div span').html('Lamp staat aan');
-    // } else {
-    //   $('#toggle div span').html('Lamp staat uit');
-    // }
-
     var $lampBtn = $('#lamp-btn');
 
     if($lampBtn.data('toggle') == true) {
       $lampBtn.data('toggle', false);
-      $lampBtn.addClass('lamp-btn-off').removeClass('lamp-btn-on').html('Uit');
-      console.log('turn off');
+      $lampBtn.addClass('lamp-btn-off').removeClass('lamp-btn-on').html('Lamp');
+
+      $BLE.Init(function() {
+        $scope.writePWM('CE:9E:48:0E:7C:52', 0, function() {
+          console.log('written 0');
+        }, function() {
+            console.log('failed to write 0');
+        });
+      });
+
+      $notice.show('De lamp staat uit');
     } else {
       $lampBtn.data('toggle', true);
-      $lampBtn.addClass('lamp-btn-on').removeClass('lamp-btn-off').html('Aan');
-      console.log('turn on');
+      $lampBtn.addClass('lamp-btn-on').removeClass('lamp-btn-off').html('Lamp');
+      
+      $BLE.Init(function() {      
+        $scope.writePWM('CE:9E:48:0E:7C:52', 255, function() {
+          console.log('written 255');
+        }, function() {
+            console.log('failed to write 255');
+        });
+      });
+
+      $notice.show('De lamp staat aan');
     }
   }
 })
+
+
+
+
+
+
+
+
+
+
+
+
+/* ------------------------------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------- */
+
 
 .controller('debugCtrl', function($scope, $BLE, $compile, $BL) {
 
